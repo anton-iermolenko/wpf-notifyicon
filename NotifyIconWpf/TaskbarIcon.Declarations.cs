@@ -31,6 +31,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using Hardcodet.Wpf.TaskbarNotification.Interop;
+using Brushes = System.Drawing.Brushes;
 
 namespace Hardcodet.Wpf.TaskbarNotification
 {
@@ -44,6 +45,11 @@ namespace Hardcodet.Wpf.TaskbarNotification
         /// Category name that is set on designer properties.
         /// </summary>
         public const string CategoryName = "NotifyIcon";
+
+        /// <summary>
+        /// Handle to transparent small icon
+        /// </summary>
+        public static IntPtr EmptyIconHandle { get; private set; }
 
 
         //POPUP CONTROLS
@@ -187,7 +193,7 @@ namespace Hardcodet.Wpf.TaskbarNotification
             set
             {
                 icon = value;
-                iconData.IconHandle = value == null ? IntPtr.Zero : icon.Handle;
+                iconData.IconHandle = value == null ? EmptyIconHandle : icon.Handle;
 
                 Util.WriteIconData(ref iconData, NotifyCommand.Modify, IconDataMembers.Icon);
             }
@@ -1886,6 +1892,14 @@ namespace Hardcodet.Wpf.TaskbarNotification
             //register change listener for the ContextMenu property
             md = new FrameworkPropertyMetadata(new PropertyChangedCallback(ContextMenuPropertyChanged));
             ContextMenuProperty.OverrideMetadata(typeof (TaskbarIcon), md);
+
+            // Create transparent icon
+            var iconSource = new Bitmap(16, 16);
+            using (var g = Graphics.FromImage(iconSource))
+            {
+                g.FillEllipse(Brushes.Transparent, 0, 0, 16, 16);
+            }
+            EmptyIconHandle = iconSource.GetHicon();
         }
     }
 }

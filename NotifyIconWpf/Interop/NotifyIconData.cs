@@ -145,7 +145,9 @@ namespace Hardcodet.Wpf.TaskbarNotification.Interop
             data.CallbackMessageId = WindowMessageSink.CallbackMessageId;
             data.VersionOrTimeout = (uint) NotifyIconVersion.Win95;
 
-            data.IconHandle = IntPtr.Zero;
+            // Shell_NotifyIcon fails in RemoteApp environment when IconHandle = IntPtr.Zero
+            // even when ValidMembers is set to IconDataMembers.Message | IconDataMembers.Tip
+            data.IconHandle = TaskbarIcon.EmptyIconHandle;
 
             //hide initially
             data.IconState = IconState.Hidden;

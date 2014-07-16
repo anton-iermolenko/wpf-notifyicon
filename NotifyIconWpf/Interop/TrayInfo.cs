@@ -29,7 +29,8 @@ namespace Hardcodet.Wpf.TaskbarNotification.Interop
                 x = rcWorkArea.Left + 2;
                 y = rcWorkArea.Bottom;
             }
-            else if (info.Edge == AppBarInfo.ScreenEdge.Bottom)
+            else if (info.Edge == AppBarInfo.ScreenEdge.Bottom
+                || info.Edge == AppBarInfo.ScreenEdge.Undefined) // Default to Bottom
             {
                 x = rcWorkArea.Right;
                 y = rcWorkArea.Bottom;

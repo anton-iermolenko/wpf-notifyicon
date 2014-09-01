@@ -1,6 +1,7 @@
 ﻿// Some interop code taken from Mike Marshall's AnyForm
 
 using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Runtime.InteropServices;
 
@@ -53,10 +54,10 @@ namespace Hardcodet.Wpf.TaskbarNotification.Interop
 
     internal class AppBarInfo
     {
-        [DllImport("user32.dll")]
+        [DllImport("user32.dll", SetLastError = true)]
         private static extern IntPtr FindWindow(String lpClassName, String lpWindowName);
 
-        [DllImport("shell32.dll")]
+        [DllImport("shell32.dll", SetLastError = true)]
         private static extern UInt32 SHAppBarMessage(UInt32 dwMessage, ref APPBARDATA data);
 
         [DllImport("user32.dll")]
@@ -106,6 +107,7 @@ namespace Hardcodet.Wpf.TaskbarNotification.Interop
         public void GetPosition(string strClassName, string strWindowName)
         {
             m_data = new APPBARDATA();
+            m_data.uEdge = (uint) ScreenEdge.Undefined;
             m_data.cbSize = (UInt32) Marshal.SizeOf(m_data.GetType());
 
             IntPtr hWnd = FindWindow(strClassName, strWindowName);
@@ -116,12 +118,12 @@ namespace Hardcodet.Wpf.TaskbarNotification.Interop
 
                 if (uResult != 1)
                 {
-                    throw new Exception("Failed to communicate with the given AppBar");
+                    Trace.TraceWarning("Failed to communicate with the given AppBar. Result: {0}, Win32 error: {1}", uResult, Marshal.GetLastWin32Error());
                 }
             }
             else
             {
-                throw new Exception("Failed to find an AppBar that matched the given criteria");
+                Trace.TraceWarning("Failed to find an AppBar that matched the given criteria. Win32 error: {0}", Marshal.GetLastWin32Error());
             }
         }
 
@@ -132,9 +134,9 @@ namespace Hardcodet.Wpf.TaskbarNotification.Interop
         }
 
 
-        public enum ScreenEdge
+        public enum ScreenEdge : uint
         {
-            Undefined = -1,
+            Undefined = 111,
             Left = ABE_LEFT,
             Top = ABE_TOP,
             Right = ABE_RIGHT,
